@@ -9,9 +9,9 @@ ROOT=$EUID
 #
 SYSMSG=""
 if [ "$USER" == root ]; then
-  USERMSG="$ Usuario $USER - root previlegios"
+  USERMSG="# Usuario $USER - root previlegios"
 else
-  USERMSG="# Usuario $USER - non root"
+  USERMSG="$ Usuario $USER - non root"
 fi
 #
 function Top() {
