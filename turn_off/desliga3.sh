@@ -130,9 +130,9 @@ function Pergunta() {
     Finalizar
     return
   else
-		SH=${sh}
-		Escolha $SH $PRO $TP
-	fi
+    SH=${sh}
+    Escolha $SH $PRO $TP
+  fi
 }	
 #
 #
@@ -215,6 +215,7 @@ function Shutdown () {
   Top
   Finalizar
   echo -e "Desligando o computador em 5 segundos..."
+  sleep 5
   shutdown -h now
 }
 #
