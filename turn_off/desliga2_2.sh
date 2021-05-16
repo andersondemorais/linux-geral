@@ -45,10 +45,10 @@ function Tempo() {
     echo "+-------------------------------------------------+"
     echo "| - - Tempo para fechar o programa:               |"
     echo "| - - - - - - - - - - - - - - - - - - - - - - - - |"
-    echo "| - - [1] 30 segundos                             |"
-    echo "| - - [2] 30 minutos                              |"   
-    echo "| - - [3] 60 minutos                              |"
-    echo "| - - [4] 90 minutos                              |"
+    echo "| - - [1]  30 segundos                            |"
+    echo "| - - [2]  30 minutos                             |"   
+    echo "| - - [3]  60 minutos                             |"
+    echo "| - - [4]  90 minutos                             |"
     echo "| - - [5] 120 minutos                             |"
     echo "| - - - - - - - - - - - - - - - - - - - - - - - - |"
     echo "| - - [0] Sair                                    |"
@@ -130,8 +130,8 @@ function Pergunta() {
     Finalizar
     return
   else
-	  SH=${sh}
-	  Escolha $SH $PRO $TP
+		SH=${sh}
+		Escolha $SH $PRO $TP
 	fi
 }	
 #
