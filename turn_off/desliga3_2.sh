@@ -200,14 +200,14 @@ function Cronometro() {
 #
 function ProgKill() {
   Top
-  pkill $PRO && {
-	  echo -e "+------------------------------>\n+"
-	  echo -e "| + ${PRO} -> FINALIZADO\n+"
-	  echo "+------------------------------>"
+	pkill $PRO && {
+		echo -e "+------------------------------>\n+"
+		echo -e "| + ${PRO} -> FINALIZADO\n+"
+		echo "+------------------------------>"
 	} || {
 		echo -e "+------------------------------>\n+"
-	  echo -e "| + ERROR!!!\n+"
-	  echo "+------------------------------>"
+		echo -e "| + ERROR!!!\n+"
+		echo "+------------------------------>"
 	}
   sleep 2
 }
