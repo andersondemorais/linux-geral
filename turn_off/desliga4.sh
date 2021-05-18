@@ -2,14 +2,17 @@
 # author: Anderson Morais
 # date: 17-may-2021(reeditado)
 # version: 4
-set -e
+#
 declare -gr USER=$(whoami)
 # ROOT=$EUID
+# tipo global integer
 declare -gi TP=286
 declare -gi PRO=19283
 declare -g SH=""
 declare -g SYSMSG=""
+# tipo global readonly Associative
 declare -grA SN=(["s"]="SIM" ["n"]="NÃO")
+# tipo global readonly non-associative
 declare -gra PROGS=("VLC" "Firefox" "Chrome")
 declare -gra TMP=(30 $((30*60)) $((60*60)) $((90*60)) $((120*60)))
 
