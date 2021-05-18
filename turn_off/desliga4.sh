@@ -19,7 +19,7 @@ declare -gra TMP=(30 $((30*60)) $((60*60)) $((90*60)) $((120*60)))
 if test "${USER}" = root; then
 	declare -gr USERMSG="# Usuário '${USER}' - root previlégios"
 else
-  	declare -gr USERMSG="$ Usuário '${USER}' - non root"
+	declare -gr USERMSG="$ Usuário '${USER}' - non root"
 fi
 
 function LimpaVar() {
@@ -31,12 +31,12 @@ function LimpaVar() {
 
 function Top() {
 	local top=""
-  	local USERMSGLEN=${#USERMSG}
-  	local SYSMSGLEN=${#SYSMSG}
-  	local SPACES=""
+	local USERMSGLEN=${#USERMSG}
+	local SYSMSGLEN=${#SYSMSG}
+	local SPACES=""
 
-  	top="+=================================================+\n"
-  	top+="|   ---Programa Desliga - ANDERSON MORAIS---      |\n"
+	top="+=================================================+\n"
+	top+="|   ---Programa Desliga - ANDERSON MORAIS---      |\n"
 
   	if test -n "$USERMSGLEN"; then
 		top+="| ${USERMSG}$(printf "%$((48-${USERMSGLEN}))s")|\n"
@@ -45,6 +45,7 @@ function Top() {
   	if test -n "$SYSMSGLEN"; then
     	top+="| ${SYSMSG}$(printf "%$((48-${SYSMSGLEN}))s")|\n"
   	fi
+
   	top+="+-------------------------------------------------+"
 
   	echo -e "${top}"
@@ -57,26 +58,26 @@ function Tempo() {
   	local menu=""
 
   	until echo "${TP}" | grep -E '^[0-5].{0}$'; do
-	    menu="+-------------------------------------------------+\n"
-	    menu+="| - - Tempo para fechar o programa: $(printf "%13s") |\n"
-	    menu+="| - - - - - - - - - - - - - - - - - - - - - - - - |\n"
-	    menu+="| - - [1]  30 segundos $(printf "%26s") |\n"
-	    menu+="| - - [2]  30 minutos $(printf "%27s") |\n"   
-	    menu+="| - - [3]  60 minutos $(printf "%27s") |\n"
-	    menu+="| - - [4]  90 minutos $(printf "%27s") |\n"
-	    menu+="| - - [5] 120 minutos $(printf "%27s") |\n"
-	    menu+="| - - - - - - - - - - - - - - - - - - - - - - - - |\n"
-	    menu+="| - - [0] Sair $(printf "%34s") |\n"
-	    menu+="+-------------------------------------------------+"
-	    echo -e "${menu}"
-	    read -p "| - - :: " TP
+		menu="+-------------------------------------------------+\n"
+		menu+="| - - Tempo para fechar o programa: $(printf "%13s") |\n"
+		menu+="| - - - - - - - - - - - - - - - - - - - - - - - - |\n"
+		menu+="| - - [1]  30 segundos $(printf "%26s") |\n"
+		menu+="| - - [2]  30 minutos $(printf "%27s") |\n"   
+		menu+="| - - [3]  60 minutos $(printf "%27s") |\n"
+		menu+="| - - [4]  90 minutos $(printf "%27s") |\n"
+		menu+="| - - [5] 120 minutos $(printf "%27s") |\n"
+		menu+="| - - - - - - - - - - - - - - - - - - - - - - - - |\n"
+		menu+="| - - [0] Sair $(printf "%34s") |\n"
+		menu+="+-------------------------------------------------+"
+		echo -e "${menu}"
+		read -p "| - - :: " TP
   	done
 
   	if [ "$TP" -ge 1 -a "$TP" -le 5 ]; then
     	TP=$(($TP-1))
   	else
-    	Finalizar
-    	return
+		Finalizar
+		return
   	fi
   
   	Programa 
@@ -86,24 +87,24 @@ function Programa() {
 	local menu=""
 
   	until echo "${PRO}" | grep -E '^[0-3].{0}$'; do
-	    menu="+-------------------------------------------------+\n"
-	    menu+="+ - - Programa que será finalizado: $(printf "%13s") |\n"
-	    menu+="+ - - - - - - - - - - - - - - - - - - - - - - - - |\n"
-	    menu+="+ - - [1] ${PROGS[0]} $(printf "%35s") |\n"
-	    menu+="+ - - [2] ${PROGS[1]} $(printf "%31s") |\n"
-	    menu+="+ - - [3] ${PROGS[2]} $(printf "%32s") |\n"
-	    menu+="+ - - - - - - - - - - - - - - - - - - - - - - - - |\n"
-	    menu+="+ - - [0] Sair $(printf "%34s") |\n"
-	    menu+="+-------------------------------------------------+"
-	    echo -e "${menu}"
-	    read -p "| - - :: " PRO
+		menu="+-------------------------------------------------+\n"
+		menu+="+ - - Programa que será finalizado: $(printf "%13s") |\n"
+		menu+="+ - - - - - - - - - - - - - - - - - - - - - - - - |\n"
+		menu+="+ - - [1] ${PROGS[0]} $(printf "%35s") |\n"
+		menu+="+ - - [2] ${PROGS[1]} $(printf "%31s") |\n"
+		menu+="+ - - [3] ${PROGS[2]} $(printf "%32s") |\n"
+		menu+="+ - - - - - - - - - - - - - - - - - - - - - - - - |\n"
+		menu+="+ - - [0] Sair $(printf "%34s") |\n"
+		menu+="+-------------------------------------------------+"
+		echo -e "${menu}"
+		read -p "| - - :: " PRO
   	done
 
   	if [ "$PRO" -ge 1 -a "$PRO" -le 3 ]; then
-    	PRO=$(($PRO-1))
+		PRO=$(($PRO-1))
   	else
-    	Finalizar
-    	return
+		Finalizar
+		return
   	fi
 
   	# -u: upper
@@ -111,10 +112,10 @@ function Programa() {
   	# checa se o programa esta em execucao
 	if ! pgrep -x ${p} > /dev/null; then
 		LimpaVar
-	    SYSMSG="**O programa ${p} não esta em execução"
-	    StartPrograma
+		SYSMSG="**O programa ${p} não esta em execução"
+		StartPrograma
 	else		
-	    Pergunta
+		Pergunta
 	fi
 }
 
@@ -124,12 +125,12 @@ function Pergunta() {
 	local menu=""
 
 	until echo "${SH}" | grep -E '^[snf].{0}$'; do
-	    menu="+-------------------------------------------------+\n"
-	    menu+="+ - - Desligar o computador também? (s/n)         |\n"
-	    menu+="+ - - (f)inalizar para sair                       |\n"
-	    menu+="+-------------------------------------------------+"
-	    echo -e "${menu}"
-	    read -p "| - - :: " SH
+		menu="+-------------------------------------------------+\n"
+		menu+="+ - - Desligar o computador também? (s/n)         |\n"
+		menu+="+ - - (f)inalizar para sair                       |\n"
+		menu+="+-------------------------------------------------+"
+		echo -e "${menu}"
+		read -p "| - - :: " SH
   	done
 
 	if test "$SH" = f ; then
@@ -191,14 +192,14 @@ function Cronometro() {
 	DadosFoot
 
 	while [[ "${tp}" -gt 0 ]]; do
-	    Top
-	    echo -e "+ - - - -\n| - Finalizar o programa ${p} em: ${tp} segundos \n+ - - - -"
-	    tp=$((${tp}-1))
-	    FuncaoFoot ${array[@]}
-	    # echo $RANDOM
-	    echo "+ - - - -"
-	    sleep 1
-	    clear
+		Top
+		echo -e "+ - - - -\n| - Finalizar o programa ${p} em: ${tp} segundos \n+ - - - -"
+		tp=$((${tp}-1))
+		FuncaoFoot ${array[@]}
+		# echo $RANDOM
+		echo "+ - - - -"
+		sleep 1
+		clear
   	done
 
 	ProgKill
@@ -239,9 +240,9 @@ function Continuar() {
     done
 
     if test "${sn}" = s; then
-    	StartPrograma
+		StartPrograma
     else
-    	Finalizar
+		Finalizar
     fi      
 }
 
