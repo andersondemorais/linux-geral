@@ -17,7 +17,7 @@ declare -gra PROGS=("VLC" "Firefox" "Chrome")
 declare -gra TMP=(30 $((30*60)) $((60*60)) $((90*60)) $((120*60)))
 
 if test "${USER}" = root; then
-  	declare -gr USERMSG="# Usuário '${USER}' - root previlégios"
+	declare -gr USERMSG="# Usuário '${USER}' - root previlégios"
 else
   	declare -gr USERMSG="$ Usuário '${USER}' - non root"
 fi
