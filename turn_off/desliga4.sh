@@ -39,7 +39,7 @@ function Top() {
   	top+="|   ---Programa Desliga - ANDERSON MORAIS---      |\n"
 
   	if test -n "$USERMSGLEN"; then
-    	top+="| ${USERMSG}$(printf "%$((48-${USERMSGLEN}))s")|\n"
+		top+="| ${USERMSG}$(printf "%$((48-${USERMSGLEN}))s")|\n"
   	fi
 
   	if test -n "$SYSMSGLEN"; then
