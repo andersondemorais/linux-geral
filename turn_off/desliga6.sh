@@ -3,6 +3,7 @@
 # date: 19-may-2021(reeditado)
 # version: 6
 #
+resize -s 30 51
 declare -gr USER=$(whoami)
 # ROOT=$EUID
 # tipo global integer
@@ -310,6 +311,7 @@ function Continuar() {
 		StartPrograma
     else
 		Finalizar
+		return
     fi      
 }
 
