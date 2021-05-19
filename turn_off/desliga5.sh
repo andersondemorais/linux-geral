@@ -6,10 +6,11 @@
 declare -gr USER=$(whoami)
 # ROOT=$EUID
 # tipo global integer
-declare -gi TP=286
-declare -gi PRO=19283
+declare -gi TP=$(($RANDOM+$RANDOM))
+declare -gi PRO=$(($RANDOM+$RANDOM))
 declare -g SH=""
 declare -g SYSMSG=""
+declare -g processo=""
 # tipo global readonly Associative
 declare -grA SN=(["s"]="SIM" ["n"]="NÃO")
 # tipo global readonly non-associative
@@ -23,8 +24,8 @@ else
 fi
 
 function LimpaVar() {
-	TP=-3293
-	PRO=-17226
+	TP=$(($RANDOM+$RANDOM))
+	PRO=$(($RANDOM+$RANDOM))
 	SH=""
 	SYSMSG=""
 }
@@ -57,25 +58,30 @@ function Tempo() {
   	#### nao estiver entre 0 e 9 continua perguntando 
   	#TP=""
   	local menu=""
+  	local tp=""
 
-  	until echo "${TP}" | grep -E '^[0-5].{0}$'; do
-		menu="+-------------------------------------------------+\n"
-		menu+="| - - Tempo para fechar o programa: $(printf "%13s") |\n"
-		menu+="| - - - - - - - - - - - - - - - - - - - - - - - - |\n"
-		menu+="| - - [1]  30 segundos $(printf "%26s") |\n"
-		menu+="| - - [2]  30 minutos $(printf "%27s") |\n"   
-		menu+="| - - [3]  60 minutos $(printf "%27s") |\n"
-		menu+="| - - [4]  90 minutos $(printf "%27s") |\n"
-		menu+="| - - [5] 120 minutos $(printf "%27s") |\n"
-		menu+="| - - - - - - - - - - - - - - - - - - - - - - - - |\n"
-		menu+="| - - [0] Sair $(printf "%34s") |\n"
-		menu+="+-------------------------------------------------+"
-		echo -e "${menu}"
-		read -p "| - - :: " TP
+  	menu="+-------------------------------------------------+\n"
+	menu+="| - - Tempo para fechar o programa: $(printf "%13s") |\n"
+	menu+="| - - - - - - - - - - - - - - - - - - - - - - - - |\n"
+	menu+="| - - [1]  30 segundos $(printf "%26s") |\n"
+	menu+="| - - [2]  30 minutos $(printf "%27s") |\n"   
+	menu+="| - - [3]  60 minutos $(printf "%27s") |\n"
+	menu+="| - - [4]  90 minutos $(printf "%27s") |\n"
+	menu+="| - - [5] 120 minutos $(printf "%27s") |\n"
+	menu+="| - - - - - - - - - - - - - - - - - - - - - - - - |\n"
+	menu+="| - - [0] Sair $(printf "%34s") |\n"
+	menu+="+-------------------------------------------------+"
+	echo -e "${menu}"
+
+  	tput sc
+  	until echo "${tp}" | grep -E '^[0-5].{0}$'; do
+		tput rc; tput el;
+		read -p "| - - :: " tp
   	done
+  	tput rc; tput ed;
 
-  	if [ "$TP" -ge 1 -a "$TP" -le 5 ]; then
-    	TP=$(($TP-1))
+  	if [ "$tp" -ge 1 -a "$tp" -le 5 ]; then
+    	TP=$(($tp-1))
   	else
 		Finalizar
 		return
@@ -86,32 +92,38 @@ function Tempo() {
 
 function Programa() {
 	local menu=""
+	local pro=""
 
-  	until echo "${PRO}" | grep -E '^[0-3].{0}$'; do
-		menu="+-------------------------------------------------+\n"
-		menu+="+ - - Programa que será finalizado: $(printf "%13s") |\n"
-		menu+="+ - - - - - - - - - - - - - - - - - - - - - - - - |\n"
-		menu+="+ - - [1] ${PROGS[0]} $(printf "%35s") |\n"
-		menu+="+ - - [2] ${PROGS[1]} $(printf "%31s") |\n"
-		menu+="+ - - [3] ${PROGS[2]} $(printf "%32s") |\n"
-		menu+="+ - - - - - - - - - - - - - - - - - - - - - - - - |\n"
-		menu+="+ - - [0] Sair $(printf "%34s") |\n"
-		menu+="+-------------------------------------------------+"
-		echo -e "${menu}"
-		read -p "| - - :: " PRO
+	menu="+-------------------------------------------------+\n"
+	menu+="+ - - Programa que será finalizado: $(printf "%13s") |\n"
+	menu+="+ - - - - - - - - - - - - - - - - - - - - - - - - |\n"
+	menu+="+ - - [1] ${PROGS[0]} $(printf "%35s") |\n"
+	menu+="+ - - [2] ${PROGS[1]} $(printf "%31s") |\n"
+	menu+="+ - - [3] ${PROGS[2]} $(printf "%32s") |\n"
+	menu+="+ - - - - - - - - - - - - - - - - - - - - - - - - |\n"
+	menu+="+ - - [0] Sair $(printf "%34s") |\n"
+	menu+="+-------------------------------------------------+"
+	echo -e "${menu}"
+
+	tput sc
+  	until echo "${pro}" | grep -E '^[0-3].{0}$'; do
+  		tput rc; tput el;
+		read -p "| - - :: " pro
   	done
+  	tput rc; tput ed;
 
-  	if [ "$PRO" -ge 1 -a "$PRO" -le 3 ]; then
-		PRO=$(($PRO-1))
+  	if [ "$pro" -ge 1 -a "$pro" -le 3 ]; then
+		PRO=$(($pro-1))
   	else
 		Finalizar
 		return
   	fi
 
   	# -u: upper
-  	typeset -l p=${PROGS[${PRO}]}
+  	processo=${PROGS[${PRO}],,}
   	# checa se o programa esta em execucao
-	if ! pgrep -x ${p} > /dev/null; then
+	if ! pgrep -x ${processo} > /dev/null; then
+		p=${PROGS[${PRO}]}
 		LimpaVar
 		SYSMSG="**O programa ${p} não esta em execução"
 		StartPrograma
@@ -125,14 +137,18 @@ function Pergunta() {
 	#### e tamanho 1 (apenas 1 caracter), continua perguntando
 	local menu=""
 
+	menu="+-------------------------------------------------+\n"
+	menu+="+ - - Desligar o computador também? (s/n)         |\n"
+	menu+="+ - - (f)inalizar para sair                       |\n"
+	menu+="+-------------------------------------------------+"
+	echo -e "${menu}"
+
+	tput sc
 	until echo "${SH}" | grep -E '^[snf].{0}$'; do
-		menu="+-------------------------------------------------+\n"
-		menu+="+ - - Desligar o computador também? (s/n)         |\n"
-		menu+="+ - - (f)inalizar para sair                       |\n"
-		menu+="+-------------------------------------------------+"
-		echo -e "${menu}"
+		
 		read -p "| - - :: " SH
   	done
+  	tput rc; tput ed;
 
 	if test "$SH" = f ; then
 		Finalizar
@@ -181,7 +197,6 @@ function Cronometro() {
 	local tp=${TMP[${TP}]}
 	local menu
 	local dados
-	typeset -l p=${PROGS[${PRO}]}
 	local continue=1
 	DadosFoot
 	Top
@@ -199,7 +214,7 @@ function Cronometro() {
 
 		if [ $(echo ${tp: -1}) -eq 0 ]; then
 			if [ $((${tp}%30)) -eq 0 ]; then
-				if ! pgrep -x ${p} > /dev/null; then
+				if ! pgrep -x ${processo} > /dev/null; then
 					continue=0
 					break
 				fi
@@ -209,14 +224,13 @@ function Cronometro() {
 		((tp--))		
 		sleep 1
   	done
-
   	tput rc; tput ed;
 
   	if [ "$continue" -eq 1 ]; then
 		ProgKill
 	else
 		menu="+ - - - - - - - - - - - - - - - - - - - - - - - - +\n"
-		dados="| O programa ${p} não está mais em execução"
+		dados="| O programa ${PROGS[${PRO}]} não está mais em execução"
 		menu+="${dados} $(printf %$((48-${#dados}))s) |\n"
 		menu+="+ - - - - - - - - - - - - - - - - - - - - - - - - +"
 		echo -e "${menu}"
@@ -225,19 +239,18 @@ function Cronometro() {
 
 function ProgKill() {
 	local menu=""
-	typeset -l p=${PROGS[${PRO}]}
 
 	menu="+ - - - - - - - - - - - - - - - - - - - - - - - - +\n"
 	menu+="| Resultado: $(printf %36s) |\n"
-	pkill "${p}" && {		
-		m="| [x] ${p} -> FINALIZADO"
+	pkill "${processo}" && {		
+		m="| [x] ${PROGS[${PRO}]} -> FINALIZADO"
 		menu+="${m} $(printf %$((48-${#m}))s) |\n"
-		m="| [ ] ${p} -> NÃO FINALIZADO"
+		m="| [ ] ${PROGS[${PRO}]} -> NÃO FINALIZADO"
 		menu+="${m} $(printf %$((48-${#m}))s) |\n"
 	} || {
-		m="| [ ] ${p} -> FINALIZADO"
+		m="| [ ] ${PROGS[${PRO}]} -> FINALIZADO"
 		menu+="${m} $(printf %$((48-${#m}))s) |\n"
-		m="| [x] ${p} -> NÃO FINALIZADO"
+		m="| [x] ${PROGS[${PRO}]} -> NÃO FINALIZADO"
 		menu+="${m} $(printf %$((48-${#m}))s) |\n"
 	}
 	menu+="+ - - - - - - - - - - - - - - - - - - - - - - - - +"
@@ -254,11 +267,15 @@ function Shutdown () {
 
 function Continuar() {
     local sn=""
+    
+    echo -e "| Deseja continuar? (s/n)"
 
+    tput sc
     until echo "${sn}" | grep -E '^[sn].{0}$'; do
-		echo "| Deseja continuar? (s/n)"
+    	tput rc; tput el;
 		read -p "| :: " sn
     done
+    tput rc; tput ed;
 
     if test "${sn}" = s; then
 		StartPrograma
@@ -270,7 +287,7 @@ function Continuar() {
 function StartPrograma() {
 	clear
 	Top
-	Tempo 
+	Tempo
 }
 
 function Finalizar() {
