@@ -35,15 +35,16 @@ function Top() {
 	local SYSMSGLEN=${#SYSMSG}
 	local SPACES=""
 
+	# lagura menus: 51 colunas
 	top="+=================================================+\n"
 	top+="|   ---Programa Desliga - ANDERSON MORAIS---      |\n"
 
   	if test -n "$USERMSGLEN"; then
-		top+="| ${USERMSG}$(printf "%$((48-${USERMSGLEN}))s")|\n"
+		top+="| ${USERMSG}$(printf %$((48-${USERMSGLEN}))s)|\n"
   	fi
 
   	if test -n "$SYSMSGLEN"; then
-    	top+="| ${SYSMSG}$(printf "%$((48-${SYSMSGLEN}))s")|\n"
+    	top+="| ${SYSMSG}$(printf %$((48-${SYSMSGLEN}))s)|\n"
   	fi
 
   	top+="+-------------------------------------------------+"
@@ -160,55 +161,91 @@ function Escolha() {
 }
  
 function DadosFoot() {
-	local ddate=$(date "+%d/%h/%y %H:%M:%S")
-	local dateend=$(date -d "+${TMP[${TP}]} seconds" "+%d/%h/%y %H:%M:%S")
-	declare -g cronfooter
-
-	cronfooter="| Início da contagem: ${ddate}\n"
-	cronfooter+="| Termino da contagem: ${dateend}\n"
-	cronfooter+="| Desligar o computador: ${SN[${SH}]}"
+	local ddata=$(date "+%d/%h/%y %H:%M:%S")
+	local dataend=$(date -d "+${TMP[${TP}]} seconds" "+%d/%h/%y %H:%M:%S")
+	declare -g crondados
+	local dados
+	
+	# 22
+	dados="| Início da contagem: ${ddata}"
+	crondados="${dados} $(printf %$((48-${#dados}))s) |\n"
+	# 23
+	dados="| Termino da contagem: ${dataend}"
+	crondados+="${dados} $(printf %$((48-${#dados}))s) |\n"
+	# 25
+	dados="| Desligar o computador: ${SN[${SH}]}"
+	crondados+="${dados} $(printf %20s) |"
 }
 
 function Cronometro() {	
 	local tp=${TMP[${TP}]}
+	local menu
+	local dados
+	typeset -l p=${PROGS[${PRO}]}
+	local continue=1
 	DadosFoot
+	Top
 
+	menu="+ - - - - - - - - - - - - - - - - - - - - - - - - +\n"
+  	menu+="${crondados}\n"
+	menu+="+ - - - - - - - - - - - - - - - - - - - - - - - - +"
+	echo -e "${menu}"
+	
+	tput sc
 	while [[ "${tp}" -gt 0 ]]; do
-		Top
-		echo "+ - - - - - - - - - - - - - - - - - - - - - - - - +"
-		echo "| - Finalizar o programa ${PROGS[${PRO}]} em: ${tp} segundos"
-		echo "+ - - - - - - - - - - - - - - - - - - - - - - - - +"
-		tp=$((${tp}-1))
-		echo -e "${cronfooter}"
-		# echo $RANDOM
-		echo "+ - - - - - - - - - - - - - - - - - - - - - - - - +"
+		tput rc; tput el;
+		dados="| Finalizar o programa ${PROGS[${PRO}]} em: ${tp} segundos"
+		echo -e "${dados} $(printf %$((48-${#dados}))s) |\n+"
+
+		if [ $(echo ${tp: -1}) -eq 0 ]; then
+			if [ $((${tp}%30)) -eq 0 ]; then
+				if ! pgrep -x ${p} > /dev/null; then
+					continue=0
+					break
+				fi
+			fi
+		fi
+
+		((tp--))		
 		sleep 1
-		clear
   	done
 
-	ProgKill
+  	tput rc; tput ed;
+
+  	if [ "$continue" -eq 1 ]; then
+		ProgKill
+	else
+		menu="+ - - - - - - - - - - - - - - - - - - - - - - - - +\n"
+		dados="| O programa ${p} não está mais em execução"
+		menu+="${dados} $(printf %$((48-${#dados}))s) |\n"
+		menu+="+ - - - - - - - - - - - - - - - - - - - - - - - - +"
+		echo -e "${menu}"
+	fi
 }
 
 function ProgKill() {
 	local menu=""
 	typeset -l p=${PROGS[${PRO}]}
-	Top	
 
-	pkill "${p}" && {
-		menu="+------------------------------>\n+\n"
-		menu+="| + ${p} -> FINALIZADO\n+\n"
-		menu+="+------------------------------>"
+	menu="+ - - - - - - - - - - - - - - - - - - - - - - - - +\n"
+	menu+="| Resultado: $(printf %36s) |\n"
+	pkill "${p}" && {		
+		m="| [x] ${p} -> FINALIZADO"
+		menu+="${m} $(printf %$((48-${#m}))s) |\n"
+		m="| [ ] ${p} -> NÃO FINALIZADO"
+		menu+="${m} $(printf %$((48-${#m}))s) |\n"
 	} || {
-		menu="+------------------------------>\n+|n"
-		menu+="| + ERROR!!!\n+\n"
-		menu+="+------------------------------>"
+		m="| [ ] ${p} -> FINALIZADO"
+		menu+="${m} $(printf %$((48-${#m}))s) |\n"
+		m="| [x] ${p} -> NÃO FINALIZADO"
+		menu+="${m} $(printf %$((48-${#m}))s) |\n"
 	}
+	menu+="+ - - - - - - - - - - - - - - - - - - - - - - - - +"
+
 	echo -e "${menu}"
-	sleep 2
 }
 
 function Shutdown () {
-	Top
 	Finalizar
 	echo "Desligando o computador em 5 segundos..."
 	sleep 5
