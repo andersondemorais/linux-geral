@@ -167,7 +167,7 @@ function Pergunta() {
 
 	tput sc
 	until echo "${SH}" | grep -E '^[snf].{0}$'; do
-		
+		tput rc; tput el;
 		read -p "| - - :: " SH
   	done
   	tput rc; tput ed;
