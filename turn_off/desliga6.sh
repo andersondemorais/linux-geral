@@ -4,8 +4,9 @@
 # version: 6
 #
 resize -s 30 51
-declare -gr USER=$(whoami)
+clear
 # ROOT=$EUID
+declare -gr USER=$(whoami)
 # tipo global integer
 declare -gi TP=$(($RANDOM+$RANDOM))
 declare -gi PRO=$(($RANDOM+$RANDOM))
