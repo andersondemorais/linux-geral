@@ -1,262 +1,345 @@
 #!/bin/bash
 # author: Anderson Morais
-# date: 15-may-2021(reeditado)
-# version: 2
+# date: 19-may-2021(reeditado)
+# version: 6
 #
-USER=$(whoami)
-ROOT=$EUID
-#
-#
-SYSMSG=""
-if [ "$USER" == root ]; then
-  USERMSG="Usuario $USER - root previlegios"
+#resize -s 30 51
+reset
+declare -gr USER=$(whoami)
+# ROOT=$EUID
+# tipo global integer
+declare -gi TP=$(($RANDOM+$RANDOM))
+declare -gi PRO=$(($RANDOM+$RANDOM))
+declare -g SH=""
+declare -g SYSMSG=""
+declare -g processo=""
+# tipo global readonly Associative
+declare -grA SN=(["s"]="SIM" ["n"]="NÃO")
+# tipo global readonly non-associative
+declare -gra PROGS=("VLC" "Firefox" "Chrome")
+declare -gra TMP=(30 $((30*60)) $((60*60)) $((90*60)) $((120*60)))
+
+if test "${USER}" = root; then
+	declare -gr USERMSG="# Usuário '${USER}' - root previlégios"
 else
-  USERMSG="Usuario $USER - non root"
+	declare -gr USERMSG="$ Usuário '${USER}' - non root"
 fi
-#
+
+function LimpaVar() {
+	TP=$(($RANDOM+$RANDOM))
+	PRO=$(($RANDOM+$RANDOM))
+	SH=""
+	SYSMSG=""
+}
+
 function Top() {
-  echo -e "---Programa Desliga - ANDERSON MORAIS---"
-  echo -e ${USERMSG}
-  echo -e ${SYSMSG}
+	local top=""
+	local USERMSGLEN=${#USERMSG}
+	local SYSMSGLEN=${#SYSMSG}
+	local espacos=""
+
+	# lagura menus: 51 colunas
+	for i in $(seq 49); do espacos+="=";done
+	top="+${espacos}+\n"
+	top+="|   ---Programa Desliga - ANDERSON MORAIS---      |\n"
+
+  	if test -n "$USERMSGLEN"; then
+		top+="| ${USERMSG}$(printf %$((48-${USERMSGLEN}))s)|\n"
+  	fi
+
+  	if test -n "$SYSMSGLEN"; then
+    	top+="| ${SYSMSG}$(printf %$((48-${SYSMSGLEN}))s)|\n"
+  	fi
+
+  	top+="+${espacos}+"
+
+  	echo -e "${top}"
 }
-#
-#
+
 function Tempo() {
-  #
-  #### enquanto o conteudo da var TP (cada caracter - cada posicao da string) 
-  #### nao estiver entre 0 e 9 continua perguntando 
-  #
-  TP=""
-  tp=''
-  until echo $tp | grep -E '^[0-5].{0}$'; do
-    echo "+---------------------------------------------------------------+"
-    echo "+ - - Tempo para fechar o programa: "
-    echo "+ - - - - - - - - - - - -"
-    echo "+ - - [1] 30 segundos"
-    echo "+ - - [2] 30 minutos"
-    echo "+ - - [3] 60 minutos"
-    echo "+ - - [4] 90 minutos"
-    echo "+ - - [5] 120 minutos"
-    echo "+ - - - - - - - - - - - -"
-    echo "+ - - [0] Sair"
-    read -p "+ - - :: " tp
-  done
+  	#### enquanto o conteudo da var TP (cada caracter - cada posicao da string) 
+  	#### nao estiver entre 0 e 9 continua perguntando 
+  	#TP=""
+  	local menu=""
+  	local tp=""
+  	local espacos=""
 
-  if [[ tp -eq 1 ]]; then
-    TP=30
-  elif [[ tp -eq 2 ]]; then
-    TP=$((30*60))
-  elif [[ tp -eq 3 ]]; then
-    TP=$((60*60))
-  elif [[ tp -eq 4 ]]; then
-    TP=$((90*60))
-  elif [[ tp -eq 5 ]]; then
-    TP=$((120*60))
-  else
-    Finalizar
-    return
-  fi
+  	for i in $(seq 49); do espacos+="-";done
+  	menu="+${espacos}+\n"
+	menu+="| - - Tempo para fechar o programa: $(printf "%13s") |\n"
+	espacos=""
+	for i in $(seq 24); do espacos+=" -";done
+	menu+="|${espacos} |\n"
+	menu+="| - - [1]  30 segundos $(printf "%26s") |\n"
+	menu+="| - - [2]  30 minutos $(printf "%27s") |\n"   
+	menu+="| - - [3]  60 minutos $(printf "%27s") |\n"
+	menu+="| - - [4]  90 minutos $(printf "%27s") |\n"
+	menu+="| - - [5] 120 minutos $(printf "%27s") |\n"
+	espacos=""
+	for i in $(seq 24); do espacos+=" -";done
+	menu+="|${espacos} |\n"
+	menu+="| - - [0] Sair $(printf "%34s") |\n"
+	espacos=""
+	for i in $(seq 49); do espacos+="-";done
+  	menu+="+${espacos}+"
+	echo -e "${menu}"
+
+  	tput sc
+  	until echo "${tp}" | grep -E '^[0-5].{0}$'; do
+		tput rc; tput el;
+		read -p "| - - :: " tp
+  	done
+  	tput rc; tput ed;
+
+  	if [ "$tp" -ge 1 -a "$tp" -le 5 ]; then
+    	TP=$(($tp-1))
+  	else
+		Finalizar
+		return
+  	fi
   
-  Programa 
+  	Programa 
 }
-#
-#
+
 function Programa() {
-  PRO=""
-  pro=''
-  until echo $pro | grep -E '^[0-3].{0}$'; do
-    echo "+---------------------------------------------------------------+"
-    echo "+ - - Programa que sera finalizado: "
-    echo "+ - - - - - - - - -"
-    echo "+ - - [1] VLC"
-    echo "+ - - [2] Firefox"
-    echo "+ - - [3] Chrome"
-    echo "+ - - - - - - - - -"
-    echo "+ - - [0] Sair"
-    read -p "+ - - :: " pro
-  done
+	local menu=""
+	local pro=""
+	local espacos=""
 
-  if [[ pro -eq 1 ]]; then
-    PRO='vlc'
-  elif [[ pro -eq 2 ]]; then
-    PRO='firefox'
-  elif [[ pro -eq 3 ]]; then
-    PRO='chrome'
-  else
-    Finalizar
-    return
-  fi
+  	for i in $(seq 49); do espacos+="-";done
+  	menu="+${espacos}+\n"
+	menu+="| - - Programa que será finalizado: $(printf "%13s") |\n"
+	espacos=""
+	for i in $(seq 24); do espacos+=" -";done
+	menu+="|${espacos} |\n"
+	menu+="| - - [1] ${PROGS[0]} $(printf "%35s") |\n"
+	menu+="| - - [2] ${PROGS[1]} $(printf "%31s") |\n"
+	menu+="| - - [3] ${PROGS[2]} $(printf "%32s") |\n"
+	espacos=""
+	for i in $(seq 24); do espacos+=" -";done
+	menu+="|${espacos} |\n"
+	menu+="| - - [0] Sair $(printf "%34s") |\n"
+	espacos=""
+	for i in $(seq 49); do espacos+="-";done
+  	menu+="+${espacos}+"
+	echo -e "${menu}"
 
-  # checa se o programa esta em execucao
-  if ! pgrep -x $PRO > /dev/null; then
-    SYSMSG="O programa ${PRO} nao esta em execucao."
-    StartPrograma
-  else
-    Pergunta
-  fi
+	tput sc
+  	until echo "${pro}" | grep -E '^[0-3].{0}$'; do
+  		tput rc; tput el;
+		read -p "| - - :: " pro
+  	done
+  	tput rc; tput ed;
+
+  	if [ "$pro" -ge 1 -a "$pro" -le 3 ]; then
+		PRO=$(($pro-1))
+  	else
+		Finalizar
+		return
+  	fi
+
+  	# lowercase
+  	processo=${PROGS[${PRO}],,}
+  	# checa se o programa esta em execucao
+	if ! pgrep -x ${processo} > /dev/null; then
+		p=${PROGS[${PRO}]}
+		LimpaVar
+		SYSMSG="**O programa ${p} não esta em execução"
+		StartPrograma
+	else		
+		Pergunta
+	fi
 }
-#
+
 function Pergunta() {
-  #
-  #### enquanto o conteudo da var SH nao for s ou n 
-  #### e tamanho 1 (apenas 1 caracter), continua perguntando
-  #
-  SH=""
-  until echo $SH | grep -E '^[sn0].{0}$'; do
-    echo "+---------------------------------------------------------------+"
-    echo "+ - - Desligar o computador tambem? (s/n)"
-    echo "+ - - 0 para sair"
-    read -p "+ - - :: " SH
-  done
+	#### enquanto o conteudo da var SH nao for s ou n 
+	#### e tamanho 1 (apenas 1 caracter), continua perguntando
+	local menu=""
+	local sn=""
+	local espacos=""
 
-  if [[ SH -eq 0 ]]; then
-    Finalizar
-    return
-  fi
-  
-  Escolha $SH $PRO $TP
-}	
-#
-#
-function Escolha() {
-  if [[ "$SH" == s ]]; then
-    if [[ "$USER" == root ]]; then	
-      clear 
-      SH=SIM
-      Cronometro $PRO $SH $TP
-      # Shutdown
-      echo 'root'
-    else
-      SYSMSG="Comando shutdwon nao permitido para o usuario"
-      StartPrograma
-    fi
-  else
-    clear
-    SH=NAO
-    Cronometro $PRO $SH $TP
-  fi
-  Finalizar
-}
-#
-#  
-function DadosFoot() {
-  #TempoConvert $TP
-  array=("Tempo para fechar o programa: ${HR} - `date`")
-  array[1]="Tempo para fechar o programa: ${HR} - `date`"
-  array[2]="Tempo para fechar o programa: ${HR} - `date`"
-  array[3]="Programa: ${PRO}"
-  array[4]="Programa: ${PRO}"
-  array[5]="Desligar o computador tambem? (s/n): ${SH}"
-  array[6]="Desligar o computador tambem? (s/n): ${SH}"
-  array[7]="\\o/"
-  array[8]="\\o/*"
-  array[9]="\\o/**"
-  key=0
-}
-#
-# 
-function FuncaoFoot() {
-  echo ${array[$key]}
-  key=$(($key+1))
-  if [ "$key" -eq 10 ]; then  
-    key=0
-  fi
-}
-#
-#
-function Cronometro() {
-  #gt -> (greather than)maior que, equival ao)
-  DadosFoot $TP $PRO $SH $HR
-  while [[ "$TP" -gt 0 ]]; do
-    Top
-    echo "+-----------------------------------------------------------------------------------+"
-    echo "+									+"
-    echo "+ + Finalizar o programa - "$PRO" - em:" $TP "segundos "
-    echo "+									+"
-    echo "+------------------------------------------------------------------------------------+"
-    #TempoConvert $TP
-    TP=$(($TP-1))
-    FuncaoFoot ${array[@]}
-    # echo $RANDOM
-    sleep 1
-    clear
-  done
-  ProgKill $PRO
-  return
-}
-#
-#
-function TempoConvert() {
-  if [[ "$TP" < 3600 ]]; then 
-    HR=""
-  elif [[ "$TP" > 3600 ]]; then
-    HR="hr"
-  elif "$TP" >= 7200 && "$TP" < 10800; then
-    HR="2h"
-  else [[ "$TP" > 10800 ]] 
-    HR="3h"
-  fi 2>&-
-}
-#
-#
-function ProgKill() {
-  pkill $PRO
-  Top
-  echo +--------------------------------------+
-  echo +
-  echo + + $PRO" -> FINALIZADO" 
-  echo +
-  echo +--------------------------------------+
-  sleep 2
-}
-#
-#
-function Shutdown () {
-  Top
-  echo "E agora e hora de dar tchau"
-  sleep 2
-  echo "TCHAAU..."
-  # xmms musica.mp3 &
-  # sleep 180
-  # killall xmms
-  shutdown -h now
-}
-#
-function Continuar() {
-    SN=""
-    until echo $SN | grep -E '^[sn].{0}$'; do
-      echo "Deseja continuar? (s/n)"
-      read -p ":: " SN
+  	for i in $(seq 49); do espacos+="-";done
+  	menu="+${espacos}+\n"
+	menu+="| - - Desligar o computador também? (s/n)         |\n"
+	menu+="| - - (f)inalizar para sair                       |\n"
+	espacos=""
+	for i in $(seq 49); do espacos+="-";done
+  	menu+="+${espacos}+"
+	echo -e "${menu}"
+
+	tput sc
+    until echo "${sn}" | grep -E '^[snf].{0}$'; do
+    	tput rc; tput el;
+		read -p "| :: " sn
     done
-    if [ "$SN" == s ]; then
-      StartPrograma
+    tput rc; tput ed;
+
+	if test "$sn" = f ; then
+		Finalizar
+		return
+	else
+		SH=${sn}
+		Escolha
+	fi
+}	
+
+function Escolha() {
+	if test "${SH[s]}" = s; then
+		if test "${USER}" = root; then	
+			clear
+			Cronometro
+			Shutdown
+		else
+			LimpaVar
+			SYSMSG="Comando shutdwon não permitido para o usuário"			
+			StartPrograma
+		fi
+	else
+		clear
+		Cronometro
+		Finalizar
+	fi
+}
+ 
+function DadosFoot() {
+	local ddata=$(date "+%d/%h/%y %H:%M:%S")
+	local dataend=$(date -d "+${TMP[${TP}]} seconds" "+%d/%h/%y %H:%M:%S")
+	declare -g crondados
+	local dados
+	
+	# 22
+	dados="| Início da contagem: ${ddata}"
+	crondados="${dados} $(printf %$((48-${#dados}))s) |\n"
+	# 23
+	dados="| Termino da contagem: ${dataend}"
+	crondados+="${dados} $(printf %$((48-${#dados}))s) |\n"
+	# 25
+	dados="| Desligar o computador: ${SN[${SH}]}"
+	crondados+="${dados} $(printf %20s) |"
+}
+
+function Cronometro() {	
+	local tp=${TMP[${TP}]}
+	local menu=""
+	local dados
+	local continue=1
+	local espacos=""
+	DadosFoot
+	Top
+
+	for i in $(seq 24); do espacos+=" -";done
+	menu+="|${espacos} |\n"
+  	menu+="${crondados}\n"
+  	espacos=""
+	for i in $(seq 24); do espacos+=" -";done
+	menu+="|${espacos} |"
+	echo -e "${menu}"
+	
+	tput sc
+	while [[ "${tp}" -gt 0 ]]; do
+		tput rc; tput el;
+		dados="| Finalizar o programa ${PROGS[${PRO}]} em: $(date -d@${tp} -u '+%Hh %Mm %Ss')"
+		echo -e "${dados} $(printf %$((48-${#dados}))s) |\n+"
+
+		if [ $(echo ${tp: -1}) -eq 0 ]; then
+			if [ $((${tp}%30)) -eq 0 ]; then
+				if ! pgrep -x ${processo} > /dev/null; then
+					continue=0
+					break
+				fi
+			fi
+		fi
+
+		((tp--))		
+		sleep 1
+  	done
+  	tput rc; tput ed;
+
+  	if [ "$continue" -eq 1 ]; then
+		ProgKill
+	else
+		espacos=""
+		for i in $(seq 24); do espacos+=" -";done
+		menu="|${espacos} |\n"
+		dados="| O programa ${PROGS[${PRO}]} não está mais em execução"
+		menu+="${dados} $(printf %$((48-${#dados}))s) |\n"
+		espacos=""
+		for i in $(seq 24); do espacos+=" -";done
+		menu+="|${espacos} |"
+		echo -e "${menu}"
+	fi
+}
+
+function ProgKill() {
+	local menu=""
+
+	menu="+ - - - - - - - - - - - - - - - - - - - - - - - - +\n"
+	menu+="| Resultado: $(printf %36s) |\n"
+	pkill "${processo}" && {		
+		m="| [x] ${PROGS[${PRO}]} -> FINALIZADO"
+		menu+="${m} $(printf %$((48-${#m}))s) |\n"
+		m="| [ ] ${PROGS[${PRO}]} -> NÃO FINALIZADO"
+		menu+="${m} $(printf %$((48-${#m}))s) |\n"
+	} || {
+		m="| [ ] ${PROGS[${PRO}]} -> FINALIZADO"
+		menu+="${m} $(printf %$((48-${#m}))s) |\n"
+		m="| [x] ${PROGS[${PRO}]} -> NÃO FINALIZADO"
+		menu+="${m} $(printf %$((48-${#m}))s) |\n"
+	}
+	menu+="+ - - - - - - - - - - - - - - - - - - - - - - - - +"
+
+	echo -e "${menu}"
+}
+
+function Shutdown () {
+	Finalizar
+	echo "Desligando o computador em 5 segundos..."
+	sleep 5
+	shutdown -h now
+}
+
+function Continuar() {
+    local sn=""
+    
+    echo -e "| Deseja continuar? (s/n)                         |"
+
+    tput sc
+    until echo "${sn}" | grep -E '^[sn].{0}$'; do
+    	tput rc; tput el;
+		read -p "| :: " sn
+    done
+    tput rc; tput ed;
+
+    if test "${sn}" = s; then
+		StartPrograma
     else
-      Finalizar
+		Finalizar
+		return
     fi      
 }
-#
-#
+
 function StartPrograma() {
-  clear
-  Top
-  Tempo 
-  #Pergunta $PRO $TP
+	clear
+	Top
+	Tempo
 }
-#
+
 function Finalizar() {
-  echo "Bye"
+	local footer=""
+	footer="+-------------------------------------------------+\n"
+	footer+="|   ---Finalizando programa Desliga---            |\n"
+	footer+="|________________TCHAU____________________________|\n"
+	echo -e "${footer}"
 }
-#
+
 function Start() {
-  if [ "$USER" == root ]; then
-    StartPrograma
-  else   
-    echo "Usuario $USER - non root"
-    Continuar
-  fi
+	if test "${USER}" = root; then
+		StartPrograma
+	else
+		Top
+		Continuar
+	fi
 }
-#
-###### inicio do programa ##############################################
-# 
+###### inicio do programa #########
 Start
-#
+######
