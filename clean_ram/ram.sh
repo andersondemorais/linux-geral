@@ -15,8 +15,10 @@ dir_d="$(dirname $script_path)/logs/"
 ## one file per day ##
 file_f="$(date '+d%dm%my%Y').txt"
 
-## get the swap usage ##
-swap_in_use=$(swapon --show | awk '{ print $4 }' | tail -n 1)
+## in Gigabytes ##
+# swap_in_use=$(swapon --show | awk '{ print $4 }' | tail -n 1)
+## in Megabytes ##
+swap_in_use=$(free -m | awk '{ print $3 }' | tail -n 1)
 swap_in_use=${swap_in_use//[!0-9]}
 
 ## entire path to log file ##
