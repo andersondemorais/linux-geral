@@ -41,20 +41,23 @@ fi
 
 if test -f ${path_p}; then
 	file_exist=true
-	date '+%Hh%Mm%Ss' >> ${path_p}
+	date '+%A - %Hh%Mm%Ss' >> ${path_p}
 	echo "Swappiness: ${swappiness_s}" >> ${path_p}	
 fi
 
-if [[ ${swap_in_use} -ge 250 ]]; then
-	if [[ ${swappiness_s} -ge 15 ]]; then
+if [[ ${swap_in_use} -ge 150 ]]; then
+	if [[ ${swappiness_s} -gt 15 ]]; then
 		# reduces the use of swap
 		sysctl vm.swappiness=15
 		# cache
 		sysctl vm.vfs_cache_pressure=50
+
+		if ${file_exist}; then
+			echo "Swappiness after reduced: $(cat /proc/sys/vm/swappiness)" >> ${path_p}
+		fi
 	fi
 
-	if ${file_exist}; then
-		echo "Swappiness after reduced size: $(cat /proc/sys/vm/swappiness)" >> ${path_p}		
+	if ${file_exist}; then	
 		echo 'Memory before clean:' >> ${path_p}
 		free -m >> ${path_p}
 		echo '' >> ${path_p}
