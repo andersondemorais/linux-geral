@@ -15,6 +15,7 @@ dir_d="$(dirname $script_path)/logs/"
 ## one file per day ##
 file_f="$(date '+d%dm%my%Y').txt"
 
+## get the swap usage ##
 ## in Gigabytes ##
 # swap_in_use=$(swapon --show | awk '{ print $4 }' | tail -n 1)
 ## in Megabytes ##
@@ -44,8 +45,8 @@ if test -f ${path_p}; then
 	echo "Swappiness: ${swappiness_s}" >> ${path_p}	
 fi
 
-if [[ ${swap_in_use} -ge 1000 ]]; then
-	if ${swappiness} -ge 15; then
+if [[ ${swap_in_use} -ge 250 ]]; then
+	if [[ ${swappiness_s} -ge 15 ]]; then
 		# reduces the use of swap
 		sysctl vm.swappiness=15
 		# cache
